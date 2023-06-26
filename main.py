@@ -9,9 +9,8 @@ with open("phonebook_raw.csv", encoding='utf-8') as f:
     pattern2 = r'\s([^\s]+)'
     pattern3 = r'\w{2,10}(вич|вна)'
     pattern_phone = r'(\+7|8|7)?\s?\(?(\d{3,4})\)?(\s|[- ])?(\d{3})[- ]?(\d{2})[- ]?(\d{2})\s?\(?(доб. )?(\d{4})?'
-    ln = []
-    fn = []
     future_str = {}
+    control = []
     res = []
     for i in contacts_list[1:]:
         info = " ".join(i)
@@ -32,10 +31,17 @@ with open("phonebook_raw.csv", encoding='utf-8') as f:
         future_str['organization'] = i[3]
         future_str['position'] = i[4]
         future_str['phone'] = phone
-        future_str['email'] = i[6]  # после этого надо объединить словари с повторяющимися значениями - как это сделать?
+        future_str['email'] = i[6]
+        control.append(future_str)  # исправить проблему того, что записывается только последняя итерация. КАК???
+    control1 = control.copy()
+    for i in range(1, len(control)):
+        if control[i - 1]['lastname'] == control[i]['lastname']:
+            for key, value in control[i].items():
+                control[i][key] = value if value else control[i - 1][key]
+            control1.remove(control[i - 1])
+    for cont in control1:
         res.append(
-            f'{future_str["lastname"]}, {future_str["firstname"]}, {future_str["surname"]}, {future_str["organization"]}, {future_str["position"]}, {future_str["phone"]}, {future_str["email"]}')
-    pprint(res)
-    with open("phonebook.csv", "w", encoding='utf-8') as f1:
-        datawriter = csv.writer(f1, delimiter=',')
-        datawriter.writerows(res)
+            f'{cont["lastname"]}, {cont["firstname"]}, {cont["surname"]}, {cont["organization"]}, {cont["position"]}, {cont["phone"]}, {cont["email"]}')
+with open("phonebook.csv", "w", encoding='utf-8') as f1:
+    datawriter = csv.writer(f1, delimiter=',')
+    datawriter.writerows(res)
