@@ -30,6 +30,7 @@ with open("phonebook_raw.csv", encoding='utf-8') as f:
         if new_contacts_list[ind][index] == '':
           new_contacts_list[ind][index] = new_contacts_list[ind-1][index]
       new_contacts_list.pop(ind-1)
+  new_contacts_list.insert(0, list(contacts_list[0]))
 with open("phonebook.csv", "w", encoding='utf-8') as f1:
   datawriter = csv.writer(f1, delimiter=',')
   datawriter.writerows(new_contacts_list)
